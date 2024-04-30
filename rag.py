@@ -24,9 +24,13 @@ from trulens_eval import (
     OpenAI as trulens_oai
 )
 from trulens_eval.feedback import Groundedness
-import nest_asyncio
 import numpy as np
 from utility.utils import get_openai_api_key
+
+import nest_asyncio
+
+nest_asyncio.apply()
+
 
 
 class RAGengine(BaseModel):
@@ -322,7 +326,7 @@ class LlamaIndexRag():
     def generate_automerging_engine(
         self,
         similarity_top_k=12,
-        rerank_top_n=2,
+        rerank_top_n=6,
         chunk_sizes=None,
         rerank_model="BAAI/bge-reranker-base"
     ):
@@ -359,7 +363,7 @@ def evaluate_rag(
     direct_rag_engine_512_chunk = llama_rag.generate_direct_rag_engine(chunk_sizes=512, use_persisted=False)
     direct_rag_engine_1024_chunk = llama_rag.generate_direct_rag_engine(chunk_sizes=1024, use_persisted=False)
 
-    # sentence window experiments
+    # # sentence window experiments
     sentence_window_engine_1_window = llama_rag.generate_sentence_window_engine(window_size= 1, use_persisted=False) # Generated best evaluation overall
     sentence_window_engine_2_window = llama_rag.generate_sentence_window_engine(window_size= 2, use_persisted=False)
     sentence_window_engine_3_window = llama_rag.generate_sentence_window_engine(window_size= 3, use_persisted=False) 
@@ -386,10 +390,14 @@ def evaluate_rag(
                   name="sentence_window: 3 window"),
         RAGengine(engine=sentence_window_engine_4_window,
                   name="sentence_window: 4 window"),
-        RAGengine(engine=automerging_engine_2_step_64, name="automerging 2 step 64"),
-        RAGengine(engine=automerging_engine_2_step_128, name="automerging 2 step 128"),
-        RAGengine(engine=automerging_engine_3_step_64, name="automerging 3 step 64"),
-        RAGengine(engine=automerging_engine_3_step_128, name="automerging 3 step 128"),
+        RAGengine(engine=automerging_engine_2_step_64,
+                  name="automerging 2 step 64"),
+        RAGengine(engine=automerging_engine_2_step_128,
+                  name="automerging 2 step 128"),
+        RAGengine(engine=automerging_engine_3_step_64,
+                  name="automerging 3 step 64"),
+        RAGengine(engine=automerging_engine_3_step_128,
+                  name="automerging 3 step 128"),
 
     ]
 
@@ -398,13 +406,13 @@ def evaluate_rag(
 
 
 if __name__ == "__main__":
-    # llama_rag = LlamaIndexRag()
-    # evaluate_rag(reset_database=False)
+    llama_rag = LlamaIndexRag()
+    evaluate_rag(reset_database=False)
 
-    highlevel_eval = Tru().get_leaderboard(app_ids=[])
-    print(highlevel_eval)
-    # save the evaluation results
-    highlevel_eval.to_csv("rag_eval_results.csv")
+    # highlevel_eval = Tru().get_leaderboard(app_ids=[])
+    # print(highlevel_eval)
+    # # save the evaluation results
+    # highlevel_eval.to_csv("rag_eval_results.csv")
 
     # llama_rag = LlamaIndexRag()
     # query_engine = llama_rag.generate_direct_rag_engine()
