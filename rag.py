@@ -159,7 +159,6 @@ class RAGeval():
                 with tru_recorder as recording:
                     eval_engine.engine.query(question)
 
-
 class LlamaIndexRag():
     def __init__(
         self,
@@ -324,9 +323,10 @@ class LlamaIndexRag():
         self,
         similarity_top_k=12,
         rerank_top_n=2,
+        chunk_sizes=None,
         rerank_model="BAAI/bge-reranker-base"
     ):
-        index = self.get_automerging_index()
+        index = self.get_automerging_index(chunk_sizes=chunk_sizes)
 
         base_retriever = index.as_retriever(
             similarity_top_k=similarity_top_k)
@@ -344,46 +344,53 @@ class LlamaIndexRag():
 
 
 def evaluate_rag(
-        eval_queries_path: str = './application_llm_eval/main_query.txt',
+        eval_queries_path: str = './application_llm_eval/valid_eval_queries_rag.txt',
         reset_database: bool = False
 ):
-
     llama_rag = LlamaIndexRag()
     rag_evaluator = RAGeval()
 
     # direct rag experiments to find the best chunnk size for the index for our application
-    # direct_rag_engine_64_chunk = llama_rag.generate_direct_rag_engine(chunk_sizes=64, use_persisted=False)
-    # direct_rag_engine_64_chunk_overlap_10 = llama_rag.generate_direct_rag_engine(chunk_sizes=64, chunk_overlap=10, use_persisted=False)
-    # direct_rag_engine_128_chunk = llama_rag.generate_direct_rag_engine(chunk_sizes=128, use_persisted=False)
-    # direct_rag_engine_256_chunk = llama_rag.generate_direct_rag_engine(chunk_sizes=256, use_persisted=False)
-    # direct_rag_engine_512_chunk = llama_rag.generate_direct_rag_engine(chunk_sizes=512, use_persisted=False)
-    # direct_rag_engine_1024_chunk = llama_rag.generate_direct_rag_engine(chunk_sizes=1024, use_persisted=False)
+    direct_rag_engine_64_chunk = llama_rag.generate_direct_rag_engine(chunk_sizes=64, use_persisted=False)
+    direct_rag_engine_64_chunk_overlap_10 = llama_rag.generate_direct_rag_engine(chunk_sizes=64, chunk_overlap=10, use_persisted=False)
+    direct_rag_engine_128_chunk = llama_rag.generate_direct_rag_engine(chunk_sizes=128, use_persisted=False) 
+    direct_rag_engine_256_chunk = llama_rag.generate_direct_rag_engine(
+        chunk_sizes=256, use_persisted=False)  # generated the best evaluation for direct rag
+    direct_rag_engine_512_chunk = llama_rag.generate_direct_rag_engine(chunk_sizes=512, use_persisted=False)
+    direct_rag_engine_1024_chunk = llama_rag.generate_direct_rag_engine(chunk_sizes=1024, use_persisted=False)
 
     # sentence window experiments
-    sentence_window_engine_1_window = llama_rag.generate_sentence_window_engine(
-        window_size=1, use_persisted=False)
-    sentence_window_engine_2_window = llama_rag.generate_sentence_window_engine(
-        window_size=2, use_persisted=False)
-    sentence_window_engine_3_window = llama_rag.generate_sentence_window_engine(
-        window_size=3, use_persisted=False)
+    sentence_window_engine_1_window = llama_rag.generate_sentence_window_engine(window_size= 1, use_persisted=False) # Generated best evaluation overall
+    sentence_window_engine_2_window = llama_rag.generate_sentence_window_engine(window_size= 2, use_persisted=False)
+    sentence_window_engine_3_window = llama_rag.generate_sentence_window_engine(window_size= 3, use_persisted=False) 
+    sentence_window_engine_4_window = llama_rag.generate_sentence_window_engine(window_size=4, use_persisted=False)
 
     # automerging experiments
-    # automerging_engine = llama_rag.generate_automerging_engine()
+    automerging_engine_3_step_64 = llama_rag.generate_automerging_engine(chunk_sizes=[1024,256,64])
+    automerging_engine_3_step_128 = llama_rag.generate_automerging_engine(chunk_sizes=[2048,513,128])
+    automerging_engine_2_step_64 = llama_rag.generate_automerging_engine(chunk_sizes=[1024,64])
+    automerging_engine_2_step_128 = llama_rag.generate_automerging_engine(chunk_sizes=[2048,128])
 
     eval_engines = [
-        # RAGengine(engine=direct_rag_engine_1024_chunk, name="direct_rag 1024 chunk"),
-        # RAGengine(engine=direct_rag_engine_512_chunk, name="direct_rag 512 chunk"),
-        # RAGengine(engine=direct_rag_engine_256_chunk, name="direct_rag 256 chunk"),
-        # RAGengine(engine=direct_rag_engine_128_chunk, name="direct_rag 128 chunk"),
-        # RAGengine(engine=direct_rag_engine_64_chunk, name="direct_rag 64 chunk"),
-        # RAGengine(engine=direct_rag_engine_64_chunk_overlap_10, name="direct_rag 64 chunk overlap 10"),
+        RAGengine(engine=direct_rag_engine_1024_chunk, name="direct_rag 1024 chunk"),
+        RAGengine(engine=direct_rag_engine_512_chunk, name="direct_rag 512 chunk"),
+        RAGengine(engine=direct_rag_engine_256_chunk, name="direct_rag 256 chunk"),
+        RAGengine(engine=direct_rag_engine_128_chunk, name="direct_rag 128 chunk"),
+        RAGengine(engine=direct_rag_engine_64_chunk, name="direct_rag 64 chunk"),
+        RAGengine(engine=direct_rag_engine_64_chunk_overlap_10, name="direct_rag 64 chunk overlap 10"),
         RAGengine(engine=sentence_window_engine_1_window,
                   name="sentence_window: 1 window"),
         RAGengine(engine=sentence_window_engine_2_window,
                   name="sentence_window: 2 window"),
         RAGengine(engine=sentence_window_engine_3_window,
                   name="sentence_window: 3 window"),
-        # RAGengine(engine=automerging_engine, name="automerging")
+        RAGengine(engine=sentence_window_engine_4_window,
+                  name="sentence_window: 4 window"),
+        RAGengine(engine=automerging_engine_2_step_64, name="automerging 2 step 64"),
+        RAGengine(engine=automerging_engine_2_step_128, name="automerging 2 step 128"),
+        RAGengine(engine=automerging_engine_3_step_64, name="automerging 3 step 64"),
+        RAGengine(engine=automerging_engine_3_step_128, name="automerging 3 step 128"),
+
     ]
 
     rag_evaluator.evaluate_rag(
@@ -391,13 +398,13 @@ def evaluate_rag(
 
 
 if __name__ == "__main__":
-    llama_rag = LlamaIndexRag()
-    evaluate_rag(reset_database=False)
+    # llama_rag = LlamaIndexRag()
+    # evaluate_rag(reset_database=False)
 
-    # highlevel_eval = Tru().get_leaderboard(app_ids=[])
-    # print(highlevel_eval)
-    # # save the evaluation results
-    # highlevel_eval.to_csv("main_query_rag_eval_results.csv")
+    highlevel_eval = Tru().get_leaderboard(app_ids=[])
+    print(highlevel_eval)
+    # save the evaluation results
+    highlevel_eval.to_csv("rag_eval_results.csv")
 
     # llama_rag = LlamaIndexRag()
     # query_engine = llama_rag.generate_direct_rag_engine()
