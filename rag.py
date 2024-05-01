@@ -406,26 +406,16 @@ def evaluate_rag(
 
 
 if __name__ == "__main__":
-    llama_rag = LlamaIndexRag()
-    evaluate_rag(reset_database=False)
 
+    # Run the evaluations
+    llama_rag = LlamaIndexRag()
+    evaluate_rag(reset_database=False) # set to True to reset the evaluation database
+
+    # Save the evaluations to a csv file
     # highlevel_eval = Tru().get_leaderboard(app_ids=[])
     # print(highlevel_eval)
     # # save the evaluation results
-    # highlevel_eval.to_csv("rag_eval_results.csv")
+    # highlevel_eval.to_csv("eval_results/rag_eval_results.csv")
 
-    # llama_rag = LlamaIndexRag()
-    # query_engine = llama_rag.generate_direct_rag_engine()
-    # query = "What actions are considered a violation of the RESPA?"
-    # response = query_engine.query(query)
-    # print(response)
-
-    # # from llama_index.core.evaluation import FaithfulnessEvaluator
-    # evaluator = ContextRelevancyEvaluator(
-    #     llm=OpenAI(temperature=0, model="gpt-3.5-turbo"))
-    # # time the evaluation
-    # import time
-    # start = time.time()
-    # eval_result = evaluator.evaluate_response(response=response, query=query)
-    # print(str(eval_result))
-    # print(f"Time taken: {time.time() - start}")
+    # Run the dashboard to inspect the evaluations in detail
+    # Tru().run_dashboard()
