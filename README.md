@@ -48,7 +48,14 @@ the prompt template is created as follows (learnt from the [papers](#prompt-engi
 
 ## How to interact with the Escrow 1024.17 Doc Chat Assistant
 ### Via Terminal
-``` python chat_assistant.py ```
+
+``` 
+$ poetry shell
+$ python chat_assistant.py 
+```
 
 ### Via Streamlit App
-``` streamlit run streamlit_frontend.py ```
+```
+$ poetry shell
+$ streamlit run app.py 
+```
