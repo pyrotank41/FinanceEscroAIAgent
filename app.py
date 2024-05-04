@@ -1,4 +1,4 @@
-from llama_index.core.memory import ChatMemoryBuffer
+
 from loguru import logger
 
 from llama_index.llms.openai import OpenAI
@@ -22,9 +22,9 @@ for message in st.session_state.messages:
         st.markdown(message['content'])
 
 if "assistant" not in st.session_state.keys():  # Initialize the chat engine
-    assistant = EscrowAssistant()
+    llm = Ollama(model="phi3", request_timeout=60.0)
+    assistant = EscrowAssistant(llm=llm)
     st.session_state.assistant = assistant
-
 
 # React to user input
 if prompt := st.chat_input("Message Escro Agent..."):

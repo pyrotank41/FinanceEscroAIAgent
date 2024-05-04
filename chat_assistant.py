@@ -10,7 +10,6 @@ from llama_index.core.indices.postprocessor import SentenceTransformerRerank, Me
 from utility.utils import get_openai_api_key, load_prompt
 from loguru import logger
 
-PROMPT = "you are an ai assistant and your name is jeff"
 
 RAG_CONTEXT_TEMPLATE= (
     "# Knowledge Context"
@@ -26,10 +25,10 @@ class EscrowAssistant():
                  system_prompt=None,
                  chat_history:Optional[List[ChatMessage]]=None,
                  prompt_file:str = "prompts/prompt_3_for_phi.txt"):
-        
+
         if system_prompt is None:
             system_prompt = load_prompt(prompt_file)
-        
+
         if not llm:
             self.llm = OpenAI(model="gpt-3.5-turbo",
                               api_key=get_openai_api_key(),
@@ -37,16 +36,14 @@ class EscrowAssistant():
             logger.info("No LLM provided, defaulting to OpenAI LLM")
         else:
             self.llm = llm
-        
+
         rag = LlamaIndexRag(llm=llm_for_rag)
-        if system_prompt is None:
-            system_prompt = PROMPT
-            
+
         # Based on our experiments, we found that sentence window retrieval
         # with size 1 works best for our use case
         self.index = rag.get_sentence_window_index(window_size=1)
         logger.info("Index created successfully")
-        
+
         # define postprocessors
         postproc = MetadataReplacementPostProcessor(
             target_metadata_key="window")
@@ -69,10 +66,10 @@ class EscrowAssistant():
             postprocessors=[postproc, rerank]
 
         )
-        
+
         if chat_history is not None:
             chat_engine._memory.set(chat_history)
-    
+
         self.chat_engine = chat_engine
 
     def streaming_chat_repl(self) -> None:
@@ -88,11 +85,8 @@ class EscrowAssistant():
             print("\n")
             message = input("User: ")
 
-
 if __name__ == "__main__":
-    
-    
-    assistant = EscrowAssistant(system_prompt=PROMPT)
+    assistant = EscrowAssistant(system_prompt=load_prompt())
     assistant.streaming_chat_repl()
     
 #     print(agent)
