@@ -15,22 +15,25 @@ Notes: although not the cheapest configuration, it was the most effective in ter
 
 
 ## Prompt Template
-the prompt template is created as follows (learnt from the [papers](#prompt-engineering-references) below):
+The prompt template is created as follows (learnt from the [papers](#prompt-engineering-references) below):
 
-\# Role  
+\# **Role**  
 (Role-play prompting is an effective stratigy where we assign a specific role to play during the interaction. This helps the model to "immerse" itself in the role and provide more accurate and relevant answers) [ref 1](#prompt-engineering-references)
 
-\# Task  
+\# **Task**  
 (a direct description of what we want the model to do. One technique that works well is to use chain-of-thought prompting [ref 2](#prompt-engineering-references) to guide the model through the task)
 
-\# Specifics
+\# **Specifics**
 (provide most inportant notes regarding the task. Integrating Emotional Stimuli [ref 3](#prompt-engineering-references) has showin to increase response quality and accuracy)
 
-\# Context   
-()
-\# Examples  
-\# Notes  
+\# **Context**   
+(what is the environment in which the task is to be performed. Fairness-guided Few-shot Prompting [ref 4](#prompt-engineering-references) has shown that providing context helps the model to understand the task better)
 
+\# **Examples**  
+(giving a few q/a pairs of example questions and answers can help the model understand the task better. This is a good practice to follow. Rethinking the Role of Demonstrations [ref 6](#prompt-engineering-references) explains this in detail)
+
+\# **Notes**  
+(Additional and repeted notes that can help the model do the task better . lost in the middle paper [ref 7](#prompt-engineering-references) shows that the llms are good at remembering the start and the end of the context better that the middle. so it is important to repeat the task and the context in the notes section briefly. Though newer models are better at finding needle in a hay stack, it is still a good practice to follow)
 ### Prompt Engineering References
 
 1. [Better Zero-Shot Reasoning with Role-Play Prompting](https://arxiv.org/abs/2308.07702)
@@ -45,11 +48,7 @@ the prompt template is created as follows (learnt from the [papers](#prompt-engi
 We are using [promptfoo](https://www.promptfoo.dev) for evaluating our prompts. To run the evaluation, first install promptfoo
 
 ```shell
-bun add promptfoo
-```
-or 
-```shell
-npm install promptfoo
+$ bun add promptfoo # or npm install -g promptfoo
 ```
 
 Then form the eval command from the root folder of this repo as follows:
@@ -57,21 +56,17 @@ Then form the eval command from the root folder of this repo as follows:
 $ cd prompt_eval_cloud
 $ promptfoo eval
 ```
-make sure the GROQ_API_KEY and OPENAI_API_KEY is set in the .env file.
-![prompt foo evaluation](media/promptfoo_eval.png)
+make sure the GROQ_API_KEY and OPENAI_API_KEY is set in the .env file as this eval evaluated models from the OpenAI API (gpt-3.5-turbo) and GROQ API(mixtral-8b).  
+
+***Note**: To save time and resources, the evaluation is not thurogh and only a few prompts are evaluated.*
+![prompt foo evaluation](media/promptfoo_eval_terminal.png)
 
 To get the detailed view of the evalutaiton, run the following command: 
 ```shell
 $ promptfoo view -y
 ```
-
-
-run the following command:
-```shell
-$ promptfoo evaluate --prompt "prompt.txt" --model "model_name"
-```
-
-
+A new tab with the following view will open in your browser:
+![prompt foo evaluation](media/promptfoo_dashboard.png)
 
 ## How to interact with the Escrow 1024.17 Doc Chat Assistant
 
