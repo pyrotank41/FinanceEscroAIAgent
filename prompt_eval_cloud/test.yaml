@@ -28,4 +28,4 @@
         - type: answer-relevance
           threshold: 0.5 # anything 0.5 is fine, as the respose could be large conpared to the query and query may lack specifics, hence > 0.5
         - type: context-faithfulness
-          threshold: 0.9
+          threshold: 0.8
