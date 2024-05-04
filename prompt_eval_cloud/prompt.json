@@ -1,0 +1,10 @@
+[
+  {
+    "role": "system",
+    "content": "{{ system_message }}\n# Knowledge context\n {{ context }}"
+  },
+  {
+    "role": "user",
+    "content": "{{ query }}"
+  }
+]

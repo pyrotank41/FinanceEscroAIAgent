@@ -1,0 +1,33 @@
+  - description: "Query not related escrow doc"
+    vars:
+      system_message: file://../prompts/prompt_main.txt
+      context: "Aggregate (or) composite analysis, hereafter called aggregate analysis, means an accounting method a servicer uses in conducting an escrow account analysis by computing the sufficiency of escrow account funds by analyzing the account as a whole. Appendix E to this part sets forth examples of aggregate escrow account analyses.\n\nAnnual escrow account statement means a statement containing all of the information set forth in § 1024.17(i). As noted in § 1024.17(i), a servicer shall submit an annual escrow account statement to the borrower within 30 calendar days of the end of the escrow account computation year, after conducting an escrow account analysis." 
+      query: "whay is sky blue?"
+
+    assert:
+        - type: factuality
+          value: sorry i cannot answer that
+        - type: contains
+          value: 'sorry'
+  
+  - description: "Query related escrow, but not in the doc"
+    vars:
+      system_message: file://../prompts/prompt_main.txt
+      context: "Aggregate (or) composite analysis, hereafter called aggregate analysis, means an accounting method a servicer uses in conducting an escrow account analysis by computing the sufficiency of escrow account funds by analyzing the account as a whole. Appendix E to this part sets forth examples of aggregate escrow account analyses.\n\nAnnual escrow account statement means a statement containing all of the information set forth in § 1024.17(i). As noted in § 1024.17(i), a servicer shall submit an annual escrow account statement to the borrower within 30 calendar days of the end of the escrow account computation year, after conducting an escrow account analysis." 
+      query: "Can a loan servicer charge a fee for responding to Qualified Written Requests?"
+
+    assert:
+        - type: factuality
+          value: sorry, i do not have indormation about it
+
+  - description: "Query related to the doc"
+    vars:
+      system_message: file://../prompts/prompt_main.txt
+      context: "Aggregate (or) composite analysis, hereafter called aggregate analysis, means an accounting method a servicer uses in conducting an escrow account analysis by computing the sufficiency of escrow account funds by analyzing the account as a whole. Appendix E to this part sets forth examples of aggregate escrow account analyses.\n\nAnnual escrow account statement means a statement containing all of the information set forth in § 1024.17(i). As noted in § 1024.17(i), a servicer shall submit an annual escrow account statement to the borrower within 30 calendar days of the end of the escrow account computation year, after conducting an escrow account analysis." 
+      query: "what is an aggrigate analyses?"
+
+    assert:
+        - type: answer-relevance
+          threshold: 0.5 # anything 0.5 is fine, as the respose could be large conpared to the query and query may lack specifics, hence > 0.5
+        - type: context-faithfulness
+          threshold: 0.9

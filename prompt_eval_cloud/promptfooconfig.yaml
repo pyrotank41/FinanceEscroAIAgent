@@ -1,0 +1,6 @@
+# This configuration compares LLM output of 2 prompts x 2 GPT models across 3 test cases.
+# Learn more: https://promptfoo.dev/docs/configuration/guide
+description: 'Simple Query Eval'
+providers: [openai:gpt-3.5-turbo]
+prompts: [prompt.json]
+tests: test*.yaml

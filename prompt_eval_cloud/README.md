@@ -1,0 +1,1 @@
+Eval for models running on our local machine, we cannot use this eval in CI/CD pipelne as the api endloints for local model is not reachable
