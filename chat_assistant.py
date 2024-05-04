@@ -1,47 +1,52 @@
-from llama_index.core.chat_engine.types import (
-    StreamingAgentChatResponse,
-    ToolOutput,
-)
-from llama_index.core.callbacks import trace_method
 from threading import Thread
-import os
-from rag import LlamaIndexRag
-from llama_index.core.chat_engine import ContextChatEngine
 from typing import List, Optional
-from llama_index.llms.openai import OpenAI
+
+from llama_index.core.callbacks import trace_method
+from llama_index.core.chat_engine import ContextChatEngine
+from llama_index.core.chat_engine.types import (StreamingAgentChatResponse,
+                                                ToolOutput)
+from llama_index.core.indices.postprocessor import (
+    MetadataReplacementPostProcessor, SentenceTransformerRerank)
 from llama_index.core.llms import ChatMessage
-
-from llama_index.core.indices.postprocessor import SentenceTransformerRerank, MetadataReplacementPostProcessor
-
-from utility.utils import get_openai_api_key, load_prompt
+from llama_index.llms.openai import OpenAI
 from loguru import logger
 
+from rag import LlamaIndexRag
+from utility.utils import get_openai_api_key, load_prompt
 
-RAG_CONTEXT_TEMPLATE= (
+RAG_CONTEXT_TEMPLATE = (
     "# Knowledge Context"
     "{context_str}"
 )
 
 
 class CustomContextChatEngine(ContextChatEngine):
+    """
+    Custom Context Chat Engine class that extends the ContextChatEngine class
+    and adds a context validity check to evaluate the relevance of the context
+    to the message before generating a response.
+    """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-    
-    @trace_method("chat")
-    def stream_chat( # overriding the stream_chat method to add context relevance check
-        self, message: str, chat_history: Optional[List[ChatMessage]] = None, context_relevance_threshold: float = 0.5
-    ) -> StreamingAgentChatResponse:
-        if chat_history is not None:
-            self._memory.set(chat_history)
-        self._memory.put(ChatMessage(content=message, role="user"))
-        context_str_template, nodes = self._generate_context(message)
 
-        ### Context Relevance Check
+    def context_validity_check(self, message: str, context_relevance_threshold: float, context_str_template: str) -> str:
+        """
+        Checks the validity of the context by evaluating the relevance of the message to the context.
+
+        Args:
+            message (str): The message to be evaluated.
+            context_relevance_threshold (float): The threshold value for context relevance.
+            context_str_template (str): The template string representing the context.
+
+        Returns:
+            str: The updated context string template.
+
+        """
         message_for_validataion = [
             ChatMessage(
                 role=self._llm.metadata.system_role,
                 content=" following is the text from my database\n" + context_str_template +
-               "does the text have an answer to the query? respond only between: 0.0 (not relevant at all) to 1.0 (has relevant information)"
+                "does the text have an answer to the query? respond only between: 0.0 (not relevant at all) to 1.0 (has relevant information)"
             ),
             ChatMessage(
                 role="user",
@@ -79,7 +84,23 @@ class CustomContextChatEngine(ContextChatEngine):
                         context_str="No relevant information found")
             except ValueError:
                 pass
-        ### Context relevance check ends here
+
+        return context_str_template
+
+    @trace_method("chat")
+    def stream_chat(  # overriding the stream_chat method to add context relevance check
+        self, message: str, chat_history: Optional[List[ChatMessage]] = None, context_relevance_threshold: float = 0.5
+    ) -> StreamingAgentChatResponse:
+        if chat_history is not None:
+            self._memory.set(chat_history)
+        self._memory.put(ChatMessage(content=message, role="user"))
+        context_str_template, nodes = self._generate_context(message)
+
+        # Context Relevance Check
+        context_str_template = self.context_validity_check(
+            message=message,
+            context_relevance_threshold=context_relevance_threshold,
+            context_str_template=context_str_template)
 
         prefix_messages = self._get_prefix_messages_with_context(
             context_str_template)
@@ -115,12 +136,12 @@ class CustomContextChatEngine(ContextChatEngine):
 
 class EscrowAssistant():
 
-    def __init__(self, 
+    def __init__(self,
                  llm=None,
                  llm_for_rag=None,
                  system_prompt=None,
-                 chat_history:Optional[List[ChatMessage]]=None,
-                 prompt_file:str = "prompts/prompt_3.txt"):
+                 chat_history: Optional[List[ChatMessage]] = None,
+                 prompt_file: str = "prompts/prompt_3.txt"):
 
         if system_prompt is None:
             system_prompt = load_prompt(prompt_file)
@@ -150,8 +171,8 @@ class EscrowAssistant():
         chat_engine = CustomContextChatEngine.from_defaults(
             llm=self.llm,
             retriever=self.index.as_retriever(
-                    similarity_top_k=6,
-                ),
+                similarity_top_k=6,
+            ),
             prefix_messages=[
                 ChatMessage(
                     role="system",
@@ -181,9 +202,11 @@ class EscrowAssistant():
             print("\n")
             message = input("User: ")
 
+
 if __name__ == "__main__":
-    assistant = EscrowAssistant(system_prompt=load_prompt("prompts/prompt_main.txt"))
+    assistant = EscrowAssistant(
+        system_prompt=load_prompt("prompts/prompt_main.txt"))
     assistant.streaming_chat_repl()
-    
+
 #     print(agent)
 #     print(agent("hello, what's your name?"))
