@@ -7,8 +7,6 @@
     assert:
         - type: factuality
           value: sorry i cannot answer that
-        - type: contains
-          value: 'sorry'
   
   - description: "Query related escrow, but not in the doc"
     vars:

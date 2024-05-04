@@ -22,12 +22,13 @@ for message in st.session_state.messages:
         st.markdown(message['content'])
 
 if "assistant" not in st.session_state.keys():  # Initialize the chat engine
-    llm = Ollama(model="llama3", request_timeout=60.0)
+    # llm = Ollama(model="llama3", request_timeout=60.0)
+    llm=None
     assistant = EscrowAssistant(llm=llm)
     st.session_state.assistant = assistant
 
 # React to user input
-if prompt := st.chat_input("Message Escro Agent..."):
+if prompt := st.chat_input("Message Escro Chat Assistant..."):
     st.chat_message('user').markdown(prompt)
 
     with st.chat_message("assistant"):

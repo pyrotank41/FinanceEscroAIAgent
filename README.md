@@ -42,20 +42,54 @@ the prompt template is created as follows (learnt from the [papers](#prompt-engi
 7. [Lost in the Middle: How Language Models Use Long Contexts](https://arxiv.org/abs/2307.03172)
 
 ## Prompt Evaluation
+We are using [promptfoo](https://www.promptfoo.dev) for evaluating our prompts. To run the evaluation, first install promptfoo
 
+```shell
+bun add promptfoo
+```
+or 
+```shell
+npm install promptfoo
+```
+
+Then form the eval command from the root folder of this repo as follows:
+```shell
+$ cd prompt_eval_cloud
+$ promptfoo eval
+```
+make sure the GROQ_API_KEY and OPENAI_API_KEY is set in the .env file.
+![prompt foo evaluation](media/promptfoo_eval.png)
+
+To get the detailed view of the evalutaiton, run the following command: 
+```shell
+$ promptfoo view -y
+```
+
+
+run the following command:
+```shell
+$ promptfoo evaluate --prompt "prompt.txt" --model "model_name"
+```
 
 
 
 ## How to interact with the Escrow 1024.17 Doc Chat Assistant
+
+First install the dependencies
+```shell
+$ poetry install #first install the dependencies
+$ poetry shell #activate the virtual environment
+``` 
+
 ### Via Terminal
 
-``` 
-$ poetry shell
+``` shell
 $ python chat_assistant.py 
 ```
+![running via terminal](media/terminal.png)
 
 ### Via Streamlit App
-```
-$ poetry shell
+``` shell
 $ streamlit run app.py 
 ```
+![running via streamlit](media/streamlit.png)

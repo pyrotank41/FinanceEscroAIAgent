@@ -1,6 +1,15 @@
 # This configuration compares LLM output of 2 prompts x 2 GPT models across 3 test cases.
 # Learn more: https://promptfoo.dev/docs/configuration/guide
 description: 'Simple Query Eval'
-providers: [openai:gpt-3.5-turbo]
+providers: 
+  - id: openai:gpt-3.5-turbo
+    config:
+      temperature: 0.1
+  - id: openai:chat:mixtral-8x7b-32768
+    config:
+      apiBaseUrl: https://api.groq.com/openai/v1
+      apiKeyEnvar: GROQ_API_KEY
+      temperature: 0.1
+
 prompts: [prompt.json]
 tests: test*.yaml

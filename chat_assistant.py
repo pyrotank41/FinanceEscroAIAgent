@@ -15,7 +15,7 @@ from rag import LlamaIndexRag
 from utility.utils import get_openai_api_key, load_prompt
 
 RAG_CONTEXT_TEMPLATE = (
-    "# Knowledge Context"
+    "# Knowledge Context\n"
     "{context_str}"
 )
 
