@@ -1,5 +1,31 @@
 # Escrow 1024.17 Doc Chat Assistant
 
+## Simplified chat assistant design diagram
+![Design Diagram](media/design_diagram.png)
+
+
+## How to interact with the Escrow 1024.17 Doc Chat Assistant
+
+First install the dependencies
+```shell
+$ poetry install #first install the dependencies
+$ poetry shell #activate the virtual environment
+``` 
+
+### Via Terminal
+
+``` shell
+$ python chat_assistant.py 
+```
+![running via terminal](media/terminal.png)
+
+### Via Streamlit App
+``` shell
+$ streamlit run app.py 
+```
+![running via streamlit](media/streamlit.png)
+
+
 ## RAG evaluation data
 Final rag eval results: [RAG evaluation results](rag_eval_results.csv)  
 I ran a experiments on Direct RAG along with advanced retrieval methods like Sentence Window and Auto-Merging Retrival. Furthermore, experiments included prameter variance as well to find the best configuration for Retrueving Escrow 1024.17 documents. The evaluations was run on [these queries](application/valid_eval_queries.txt). The results are as follows:
@@ -68,23 +94,21 @@ $ promptfoo view -y
 A new tab with the following view will open in your browser:
 ![prompt foo evaluation](media/promptfoo_dashboard.png)
 
-## How to interact with the Escrow 1024.17 Doc Chat Assistant
+## fine-tuneing
+Refer the following [notebook](generate_dataset_finetune.ipynb) on how the dataset was generated and the model.
 
-First install the dependencies
+Refer the following [notebook](https://colab.research.google.com/drive/1Mf1qeQl8EXwbUQz8eE7dHG0xC1RLNYLi?usp=sharing) for see how the model was finetuned on the Escrow 1024.17 documents.  
+(*note: this notebook is a colab motebook and it was easy to run the experiments on the google cloud with powerful gpus.*)
+
+The finetuned model is available at [huggingface](https://huggingface.co/pyrotank41/llama3-8b-escrow-unsloth-merged-gguf/tree/main)
+
+Download the model and place it in the `fine_tuned_model` folder and from the root of the repo run the following command to interact create ollama model.
+
 ```shell
-$ poetry install #first install the dependencies
-$ poetry shell #activate the virtual environment
-``` 
-
-### Via Terminal
-
-``` shell
-$ python chat_assistant.py 
+$ ollama create escrow -f ./Modelfile
 ```
-![running via terminal](media/terminal.png)
 
-### Via Streamlit App
-``` shell
-$ streamlit run app.py 
+to interact with the model run the following command:
+```shell
+$ ollama run escrow
 ```
-![running via streamlit](media/streamlit.png)
