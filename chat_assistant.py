@@ -28,6 +28,9 @@ class CustomContextChatEngine(ContextChatEngine):
     """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.validator_llm = OpenAI(model="gpt-3.5-turbo",
+                          api_key=get_openai_api_key(),
+                          temperature=0.1)
 
     def context_validity_check(self, message: str, context_relevance_threshold: float, context_str_template: str) -> str:
         """
@@ -45,19 +48,18 @@ class CustomContextChatEngine(ContextChatEngine):
         message_for_validataion = [
             ChatMessage(
                 role=self._llm.metadata.system_role,
-                content=" following is the text from my database\n" + context_str_template +
-                "does the text have an answer to the query? respond only between: 0.0 (not relevant at all) to 1.0 (has relevant information)"
+                content=" following is the text from my database\n\n" + context_str_template +
+                "\n\n # Instruction: respond only with a number between: 0.0 (not relevant at all) to 1.0 (has relevant information)"
             ),
             ChatMessage(
                 role="user",
-                content=message
+                content=message 
             )
         ]
 
         logger.debug(context_str_template)
-        relevance = self._llm
-        relevance = self._llm.chat(message_for_validataion)
-
+        relevance = self.validator_llm.chat(message_for_validataion)
+        print(relevance)
         # Function to check and extract float
         def extract_floats(arr):
             floats = []
@@ -204,7 +206,11 @@ class EscrowAssistant():
 
 
 if __name__ == "__main__":
+    from llama_index.llms.ollama import Ollama
+    llm = Ollama(model="escrow", request_timeout=60.0)
+    llm = llm
     assistant = EscrowAssistant(
+        llm = llm,
         system_prompt=load_prompt("prompts/prompt_main.txt"))
     assistant.streaming_chat_repl()
 

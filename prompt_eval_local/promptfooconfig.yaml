@@ -1,6 +1,8 @@
 # This configuration compares LLM output of 2 prompts x 2 GPT models across 3 test cases.
 # Learn more: https://promptfoo.dev/docs/configuration/guide
 description: 'Simple Query Eval'
-providers: [ollama:llama3]
+providers: 
+  - id: ollama:llama3
+  - id: ollama:escrow
 prompts: [prompt.json]
 tests: test*.yaml
