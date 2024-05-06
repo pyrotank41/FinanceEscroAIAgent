@@ -152,16 +152,20 @@ class EscrowAssistant():
             self.llm = OpenAI(model="gpt-3.5-turbo",
                               api_key=get_openai_api_key(),
                               temperature=0.1)
-            logger.info("No LLM provided, defaulting to OpenAI LLM")
+            logger.info("No LLM provided, defaulting to OpenAI LLM...")
         else:
             self.llm = llm
-
+            
+        if system_prompt == "" or system_prompt is None:
+            logger.warning(
+                "No system prompt provided, the system prompt message will be empty...")
+        
         rag = LlamaIndexRag(llm=llm_for_rag)
 
         # Based on our experiments, we found that sentence window retrieval
         # with size 1 works best for our use case
         self.index = rag.get_sentence_window_index(window_size=1)
-        logger.info("Index created successfully")
+        logger.info("Index created successfully... Finalizing chat assistant...")
 
         # define postprocessors
         postproc = MetadataReplacementPostProcessor(
@@ -190,6 +194,7 @@ class EscrowAssistant():
             chat_engine._memory.set(chat_history)
 
         self.chat_engine = chat_engine
+        logger.info("Chat assistant initialied successfully")
 
     def streaming_chat_repl(self) -> None:
         """Enter interactive chat REPL with streaming responses."""
@@ -206,9 +211,9 @@ class EscrowAssistant():
 
 
 if __name__ == "__main__":
-    from llama_index.llms.ollama import Ollama
-    llm = Ollama(model="escrow", request_timeout=60.0)
-    llm = llm
+    # from llama_index.llms.ollama import Ollama
+    # llm = Ollama(model="escrow", request_timeout=60.0)
+    llm = None
     assistant = EscrowAssistant(
         llm = llm,
         system_prompt=load_prompt("prompts/prompt_main.txt"))

@@ -6,24 +6,52 @@
 
 ## How to interact with the Escrow 1024.17 Doc Chat Assistant
 
+### Set the environment variables via .env file
+Create a `.env` file in the root of the repo and set the following environment variables:
+
+```shell
+OPENAI_API_KEY=<your openai api key>
+GROQ_API_KEY=<your groq api key> # required if you are running prompt evals, as the evals uses Mixtral-8b model from groq api to evaluate the prompts against openai's gpt-3.5-turbo model
+```
+the app will use the api keys to interact with the openai api and the groq api using this .env file, do dont need to export it manually
+
+### Run the chat assistant
+
+Easiest way to interact with the chat assistant is via the strreamlit app. To run the app, without worrying about the dependencies, you can use the docker container. 
+to run docker container, we use `docker compose` to build and run the container. 
+
+from the root of the repo run the following command:
+
+```shell
+docker compose up --build
+```
+
+The comand above will bild the container and run the streamlit app. The app will be available at `http://localhost:8501` in your browser.
+
+**NOTE**: It will take time to build the container as well as for the streamlit app to start. As the embedding model is large, it will take time to load the model, create index and start the app. (To save time and resources the vector database is not hosted on the cloud, it gets created on the fly when the app starts. This is not the best practice and should be avoided in production.)
+
+#### You can run the app without Docker as well.
 First install the dependencies
 ```shell
 $ poetry install #first install the dependencies
 $ poetry shell #activate the virtual environment
 ``` 
 
-### Via Terminal
+##### Chat Via Terminal
 
 ``` shell
 $ python chat_assistant.py 
 ```
 ![running via terminal](media/terminal.png)
 
-### Via Streamlit App
+##### Chat via Streamlit App
 ``` shell
 $ streamlit run app.py 
 ```
 ![running via streamlit](media/streamlit.png)
+
+## Escrow 1024.17 data preparation
+Please refer to the [escrow_data_retriever.ipynb notebook](escro_data_retriever.ipynb) for the data preparation steps. The notebook explains how the data was retrieved from the Escrow 1024.17 website and how the data was preprocessed to create the dataset for RAG indexingl.
 
 
 ## RAG evaluation data
@@ -113,4 +141,49 @@ to interact with the model run the following command:
 $ ollama run escro_gemma:latest 
 ```
  **NOTE**
- The model finetuning dataset consisted only the positive q/a pairs, to get better performance we need to include negative q/a pairs as well along with some chatdata as well. This will help the model to understand the context better and provide more accurate answers.
+ The model finetuning dataset consisted only the positive q/a pairs and no relevent context q/a, to get better performance we need to include negative q/a pairs as well along with some chat data. This will help the model to understand the context better and provide more accurate responses as intended for this application.
+
+
+
+### Deploy fine-tuned model to AWS (for future referance)
+
+```python
+import json
+import sagemaker
+import boto3
+from sagemaker.huggingface import HuggingFaceModel, get_huggingface_llm_image_uri
+
+try:
+	role = sagemaker.get_execution_role()
+except ValueError:
+	iam = boto3.client('iam')
+	role = iam.get_role(RoleName='sagemaker_execution_role')['Role']['Arn']
+
+# Hub Model configuration. https://huggingface.co/models
+hub = {
+	'HF_MODEL_ID':'pyrotank41/gemma-7b-it-escrow-merged-gguf',
+	'SM_NUM_GPUS': json.dumps(1)
+}
+
+
+
+# create Hugging Face Model Class
+huggingface_model = HuggingFaceModel(
+	image_uri=get_huggingface_llm_image_uri("huggingface",version="1.4.2"),
+	env=hub,
+	role=role, 
+)
+
+# deploy model to SageMaker Inference
+predictor = huggingface_model.deploy(
+	initial_instance_count=1,
+	instance_type="ml.g5.2xlarge",
+	container_startup_health_check_timeout=300,
+  )
+  
+# send request
+predictor.predict({
+	"inputs": "What is the escrow 1024.17 document?",
+})
+```
+

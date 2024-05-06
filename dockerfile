@@ -1,42 +1,33 @@
 # Use an official Python runtime as a parent image
-FROM python:3.11.5
-
-# Install system dependencies
-RUN apt-get update && apt-get install -y gcc python3-dev curl && rm -rf /var/lib/apt/lists/*
+FROM python:3.11.5-slim
 
 # Set the working directory in the container
-WORKDIR /app
+WORKDIR /usr/src/app
+
+# Install system dependencies required for Poetry
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libffi-dev \
+    libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install Poetry
-RUN pip install poetry
+RUN pip install --no-cache-dir poetry
 
-# Copy the local code to the container
-COPY . /app
+# Copy the Poetry configuration files into the container
+COPY pyproject.toml poetry.lock* ./
 
-# poetry:
-ENV POETRY_NO_INTERACTION=1 \
-    POETRY_VIRTUALENVS_CREATE=false \
-    POETRY_CACHE_DIR='/var/cache/pypoetry' \
-    POETRY_HOME='/usr/local'
+# Configure Poetry:
+# - Disable virtual environments as the container itself is isolated
+# - Install all dependencies including dev if needed
+RUN poetry config virtualenvs.create false \
+    && poetry install --no-interaction --no-ansi
 
-# Adjust the PATH environment variable
-ENV PATH="/usr/local:$PATH"
+# Copy the rest of your application code
+COPY prompts ./prompts
+COPY utility ./utility
+COPY escrow_data ./escrow_data
+COPY chat_assistant.py app.py rag.py .env ./
 
-CMD ls
-
-# Install dependencies using Poetry
-RUN poetry install 
-
-# Check where Streamlit is installed
-RUN find / -name streamlit
-
-# Re-check the PATH and search for Streamlit
-RUN echo $PATH && which streamlit
-
-# Make port 8501 available to the world outside this container
-EXPOSE 8501
-
-HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
-
-# Run the app when the container launches
-ENTRYPOINT ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+# The command to run the application
+# CMD ["poetry", "run", "python", "chat_assistant.py"]
