@@ -112,3 +112,5 @@ to interact with the model run the following command:
 ```shell
 $ ollama run escro_gemma:latest 
 ```
+ **NOTE**
+ The model finetuning dataset consisted only the positive q/a pairs, to get better performance we need to include negative q/a pairs as well along with some chatdata as well. This will help the model to understand the context better and provide more accurate answers.
