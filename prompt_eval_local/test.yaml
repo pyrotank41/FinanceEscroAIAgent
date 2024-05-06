@@ -27,6 +27,9 @@
     assert:
         - type: factuality
           value: sorry, i do not have indormation about it
+        
+        - type: factuality
+          value: does not mention "Knowledge Context."
 
   - description: "Query related to the doc"
     vars:
@@ -36,6 +39,32 @@
 
     assert:
         - type: answer-relevance
-          threshold: 0.5 # anything 0.5 is fine, as the respose could be large conpared to the query and query may lack specifics, hence > 0.5
+          threshold: 0.5 # anything above 0.5 is fine, as the respose could be large conpared to the query and query may lack specifics, hence > 0.5
         - type: context-faithfulness
           threshold: 0.9
+  
+  - description: "Query not related to the doc, but related to the topic, where rag returns non relevant queries"
+    vars:
+      system_message: file://../prompts/prompt_main.txt
+      context: "At the time a servicer creates an escrow account for a borrower, the servicer may charge the borrower an amount sufficient to pay the charges respecting the mortgaged property, such as taxes and insurance, which are attributable to the period from the date such payment(s) were last paid until the initial payment date.\nIf a servicer advances funds to an escrow account to ensure that the borrower's hazard insurance premium charges are paid in a timely manner, a servicer may seek repayment from the borrower for the funds the servicer advanced, unless otherwise prohibited by applicable law.\nNotwithstanding paragraphs (k)(5)(i) and (k)(5)(ii)(B) of this section and subject to the requirements in § 1024.37,  a servicer that qualifies as a small servicer pursuant to 12 CFR 1026.41(e)(4)  may purchase force-placed insurance and charge the cost of that insurance to the borrower if the cost to the borrower of the force-placed insurance is less than the amount the small servicer would need to disburse from the borrower's escrow account to ensure that the borrower's hazard insurance premium charges were paid in a timely manner.\nAs noted in § 1024.17(f),  if a servicer advances funds for a borrower, then the servicer must perform an escrow account analysis before seeking repayment of the deficiency.\n(1) A lender or servicer (hereafter servicer) shall not require a borrower to deposit into any escrow account, created in connection with a federally related mortgage loan, more than the following amounts:\n(i) Charges at settlement or upon creation of an escrow account.\n(3) For the payment of property taxes from the escrow account, if a taxing jurisdiction offers a servicer a choice between annual and installment disbursements, the servicer must also comply with this paragraph (k)(3)" 
+      query: Can a loan servicer charge a fee for responding to Qualified Written Requests?"
+
+    assert:
+        - type: factuality
+          value: sorry, i do not have indormation about it
+        
+        - type: factuality
+          value: does not mention "Knowledge Context."
+  
+  - description: "Query not related to the doc, but related to the topic, where rag returns non relevant queries"
+    vars:
+      system_message: file://../prompts/prompt_main.txt
+      context: "(ii) Inability to disburse funds - \n\n\nSee interpretation of 17(k)(5)(ii) Inability to disburse funds.\n\nExamples of reasonable basis to believe that a policy has been cancelled or not renewed.\n\nIf such documents provide for escrow accounts up to the RESPA limits, then the servicer may require the maximum amounts consistent with this section, unless an applicable Federal or State law sets a lesser amount.\n\n(c) Limits on payments to escrow accounts.\n\nPenalty means a late charge imposed by the payee for paying after the disbursement is due.\n\n(i) If an escrow account analysis discloses a shortage of less than one month's escrow account payment, then the servicer has three possible courses of action:\n\n(A) The servicer may allow a shortage to exist and do nothing to change it;\n\n(B) The servicer may require the borrower to repay the shortage amount within 30 days; or\n\nC) The servicer may require the borrower to repay the shortage amount in equal monthly payments over at least a 12-month period."
+      query: What actions are considered a violation of the RESPA?"
+
+    assert:
+        - type: factuality
+          value: sorry, i do not have indormation about it
+        
+        - type: factuality
+          value: does not mention "Knowledge Context."

@@ -13,20 +13,23 @@ Create a `.env` file in the root of the repo and set the following environment v
 OPENAI_API_KEY=<your openai api key>
 GROQ_API_KEY=<your groq api key> # required if you are running prompt evals, as the evals uses Mixtral-8b model from groq api to evaluate the prompts against openai's gpt-3.5-turbo model
 ```
-the app will use the api keys to interact with the openai api and the groq api using this .env file, do dont need to export it manually
+the app will use the api keys to interact with the openai api and the groq api using this .env file, you do not need to export it manually.
 
 ### Run the chat assistant
 
-Easiest way to interact with the chat assistant is via the strreamlit app. To run the app, without worrying about the dependencies, you can use the docker container. 
-to run docker container, we use `docker compose` to build and run the container. 
+Easiest way to interact with the chat assistant is via the strreamlit app. To run the app, without worrying about the dependencies, you can use the docker.  
+To build and run our app in docker container, we use `docker compose`. 
 
-from the root of the repo run the following command:
+From the root of the repo run the following command:
 
 ```shell
 docker compose up --build
 ```
 
 The comand above will bild the container and run the streamlit app. The app will be available at `http://localhost:8501` in your browser.
+
+Please check the terminal for logs and errors if any. 
+
 
 **NOTE**: It will take time to build the container as well as for the streamlit app to start. As the embedding model is large, it will take time to load the model, create index and start the app. (To save time and resources the vector database is not hosted on the cloud, it gets created on the fly when the app starts. This is not the best practice and should be avoided in production.)
 
@@ -133,17 +136,20 @@ The finetuned gemma model is available at [huggingface](https://huggingface.co/p
 Download the model and place it in the `fine_tuned_model` folder in the repo and from the root of the repo run the following command to interact create ollama model.
 
 ```shell
-$ ollama create escro_gemma -f ./ModelfileGemma
+$ ollama create escrow_gemma -f ./ModelfileGemma
 ```
 
 to interact with the model run the following command:
 ```shell
-$ ollama run escro_gemma:latest 
+$ ollama run escrow_gemma:latest 
 ```
  **NOTE**
  The model finetuning dataset consisted only the positive q/a pairs and no relevent context q/a, to get better performance we need to include negative q/a pairs as well along with some chat data. This will help the model to understand the context better and provide more accurate responses as intended for this application.
 
+#### Fine-Tuned Model Evaluation
+Please check out the [link](https://app.promptfoo.dev/eval/f:a0724f9a-6b9a-47c9-a988-42917d726ea9/) to see the evaluation of the fine-tuned model. The model was evaluated on these [test](prompt_eval_local/test.yaml) and compared to open source models: 'llama3-8b' and 'gemma-8b'. 
 
+In the evaluation, the fine-tuned model is named 'escrow_gemma:latest'.
 
 ### Deploy fine-tuned model to AWS (for future referance)
 
