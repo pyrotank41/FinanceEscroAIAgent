@@ -143,7 +143,7 @@ class EscrowAssistant():
                  llm_for_rag=None,
                  system_prompt=None,
                  chat_history: Optional[List[ChatMessage]] = None,
-                 prompt_file: str = "prompts/prompt_3.txt"):
+                 prompt_file: str = "prompts/prompt_main.txt"):
 
         if system_prompt is None:
             system_prompt = load_prompt(prompt_file)

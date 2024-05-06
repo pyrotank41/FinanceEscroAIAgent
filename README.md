@@ -100,15 +100,15 @@ Refer the following [notebook](generate_dataset_finetune.ipynb) on how the datas
 Refer the following [notebook](https://colab.research.google.com/drive/1Mf1qeQl8EXwbUQz8eE7dHG0xC1RLNYLi?usp=sharing) for see how the model was finetuned on the Escrow 1024.17 documents.  
 (*note: this notebook is a colab motebook and it was easy to run the experiments on the google cloud with powerful gpus.*)
 
-The finetuned model is available at [huggingface](https://huggingface.co/pyrotank41/llama3-8b-escrow-unsloth-merged-gguf/tree/main)
+The finetuned gemma model is available at [huggingface](https://huggingface.co/pyrotank41/gemma-7b-it-escrow-merged-gguf/tree/main)
 
-Download the model and place it in the `fine_tuned_model` folder and from the root of the repo run the following command to interact create ollama model.
+Download the model and place it in the `fine_tuned_model` folder in the repo and from the root of the repo run the following command to interact create ollama model.
 
 ```shell
-$ ollama create escrow -f ./Modelfile
+$ ollama create escro_gemma -f ./ModelfileGemma
 ```
 
 to interact with the model run the following command:
 ```shell
-$ ollama run escrow
+$ ollama run escro_gemma:latest 
 ```

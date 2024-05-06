@@ -3,6 +3,6 @@
 description: 'Simple Query Eval'
 providers: 
   - id: ollama:llama3
-  - id: ollama:escrow
+  - id: ollama:escro_gemma:latest
 prompts: [prompt.json]
 tests: test*.yaml

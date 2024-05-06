@@ -22,7 +22,7 @@ for message in st.session_state.messages:
         st.markdown(message['content'])
 
 if "assistant" not in st.session_state.keys():  # Initialize the chat engine
-    llm = Ollama(model="escrow", request_timeout=60.0)
+    llm = Ollama(model="escro_gemma", request_timeout=60.0)
     llm=llm
     assistant = EscrowAssistant(llm=llm)
     st.session_state.assistant = assistant

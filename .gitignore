@@ -4,3 +4,4 @@
 storage
 *.sqlite
 fine_tuned_model/
+__pycache__/

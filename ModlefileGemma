@@ -1,0 +1,17 @@
+FROM ./fine_tuned_model/gemma-7b-it-escrow-merged-gguf-unsloth.Q8_0.gguf
+
+
+TEMPLATE """
+<start_of_turn>user
+{{ if .System }}{{ .System }} {{ end }}{{ .Prompt }}<end_of_turn>
+<start_of_turn>model
+{{ .Response }}<end_of_turn>
+"""
+SYSTEM """You are a helpful assistant."""
+
+PARAMETER penalize_newline false
+PARAMETER repeat_penalty 1
+PARAMETER stop "<start_of_turn>"
+PARAMETER stop "<end_of_turn>"
+
+

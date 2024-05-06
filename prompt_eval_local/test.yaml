@@ -17,6 +17,16 @@
     assert:
         - type: factuality
           value: sorry, i do not have indormation about it
+  
+  - description: "Query related escrow, but not in the doc, nothing in the context either"
+    vars:
+      system_message: file://../prompts/prompt_main.txt
+      context: "No relevant information found" 
+      query: "Can a loan servicer charge a fee for responding to Qualified Written Requests?"
+
+    assert:
+        - type: factuality
+          value: sorry, i do not have indormation about it
 
   - description: "Query related to the doc"
     vars:
